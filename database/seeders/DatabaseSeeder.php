@@ -125,5 +125,90 @@ class DatabaseSeeder extends Seeder
             $selectedSubjectIds = array_map(fn($idx) => $subjectModels[$idx]->id, $subjIndices);
             $student->subjects()->sync($selectedSubjectIds);
         }
+
+        // Teachers Seeding
+        $sampleTeachers = [
+            [
+                'name' => 'Prof. Muhammad Usman',
+                'email' => 'usman.math@school.com',
+                'phone' => '0301-7654321',
+                'qualification' => 'M.Sc. Mathematics (PU), B.Ed',
+                'experience' => '8 Years Experience',
+                'gender' => 'male',
+                'address' => 'House 14, Johar Town, Lahore',
+                'incharge_class_id' => $classModels[4]->id, // Class 10
+                'salary' => 65000.00,
+                'joining_date' => '2020-08-15',
+                'avatar_color' => 'indigo',
+                'bio' => 'Senior Mathematics Department Head specializing in Algebra and Calculus for Matric and Senior classes.',
+                'teaching_classes' => [3, 4, 5],
+                'subjects' => [0], // Mathematics
+            ],
+            [
+                'name' => 'Ms. Ayesha Siddiqa',
+                'email' => 'ayesha.physics@school.com',
+                'phone' => '0322-4433221',
+                'qualification' => 'M.Phil Physics (QAU Islamabad)',
+                'experience' => '6 Years Experience',
+                'gender' => 'female',
+                'address' => 'Street 7, F-8/2, Islamabad',
+                'incharge_class_id' => $classModels[3]->id, // Class 9
+                'salary' => 60000.00,
+                'joining_date' => '2021-03-01',
+                'avatar_color' => 'purple',
+                'bio' => 'Passionate physics lecturer focusing on concept clarity and laboratory experiments.',
+                'teaching_classes' => [3, 4],
+                'subjects' => [4, 5], // Physics, Chemistry
+            ],
+            [
+                'name' => 'Sir Salman Tariq',
+                'email' => 'salman.cs@school.com',
+                'phone' => '0345-1122334',
+                'qualification' => 'BS Computer Science (FAST-NUCES)',
+                'experience' => '4 Years Experience',
+                'gender' => 'male',
+                'address' => 'Plaza 4, Gulberg III, Lahore',
+                'incharge_class_id' => null, // Not a class incharge, subject teacher
+                'salary' => 55000.00,
+                'joining_date' => '2023-01-10',
+                'avatar_color' => 'emerald',
+                'bio' => 'IT Instructor leading computer labs, Python basics, and ICT curriculum across middle and high school.',
+                'teaching_classes' => [2, 3, 4, 5],
+                'subjects' => [7], // Computer Science
+            ],
+            [
+                'name' => 'Mrs. Farzana Batool',
+                'email' => 'farzana.english@school.com',
+                'phone' => '0300-9988776',
+                'qualification' => 'M.A English Literature & Linguistics (GCU)',
+                'experience' => '10 Years Experience',
+                'gender' => 'female',
+                'address' => 'Canal View Housing Scheme, Lahore',
+                'incharge_class_id' => $classModels[2]->id, // Class 8
+                'salary' => 70000.00,
+                'joining_date' => '2019-02-12',
+                'avatar_color' => 'blue',
+                'bio' => 'Head of English Language & Literature, debate coach, and student mentor.',
+                'teaching_classes' => [0, 1, 2, 3, 4],
+                'subjects' => [1], // English
+            ]
+        ];
+
+        foreach ($sampleTeachers as $tData) {
+            $teachClasses = $tData['teaching_classes'];
+            $teachSubjects = $tData['subjects'];
+            unset($tData['teaching_classes'], $tData['subjects']);
+
+            $teacher = \App\Models\Teacher::firstOrCreate(
+                ['email' => $tData['email']],
+                $tData
+            );
+
+            $mappedClassIds = array_map(fn($idx) => $classModels[$idx]->id, $teachClasses);
+            $teacher->teachingClasses()->sync($mappedClassIds);
+
+            $mappedSubjectIds = array_map(fn($idx) => $subjectModels[$idx]->id, $teachSubjects);
+            $teacher->subjects()->sync($mappedSubjectIds);
+        }
     }
 }

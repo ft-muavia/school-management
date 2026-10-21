@@ -111,14 +111,25 @@ export default function Dashboard({ stats = {}, recentStudents = [] }) {
                     </div>
 
                     {/* Quick Navigation / Action Bar */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <Link
                             href={route('students.index')}
                             className="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow hover:shadow-md transition flex items-center justify-between group"
                         >
                             <div>
-                                <h3 className="font-bold text-lg">View All Students</h3>
-                                <p className="text-blue-100 text-sm">Search, filter by class & fee status</p>
+                                <h3 className="font-bold text-lg">All Students</h3>
+                                <p className="text-blue-100 text-xs">Search, filter & records</p>
+                            </div>
+                            <span className="text-2xl transform group-hover:translate-x-1 transition">&rarr;</span>
+                        </Link>
+
+                        <Link
+                            href={route('teachers.index')}
+                            className="p-5 bg-gradient-to-r from-purple-600 to-violet-600 text-white rounded-xl shadow hover:shadow-md transition flex items-center justify-between group"
+                        >
+                            <div>
+                                <h3 className="font-bold text-lg">Teachers Faculty</h3>
+                                <p className="text-purple-100 text-xs">Qualifications & incharge cards</p>
                             </div>
                             <span className="text-2xl transform group-hover:translate-x-1 transition">&rarr;</span>
                         </Link>
@@ -129,7 +140,7 @@ export default function Dashboard({ stats = {}, recentStudents = [] }) {
                         >
                             <div>
                                 <h3 className="font-bold text-lg">New Admission</h3>
-                                <p className="text-emerald-100 text-sm">Register student with subjects & address</p>
+                                <p className="text-emerald-100 text-xs">Register student & fees</p>
                             </div>
                             <span className="text-2xl transform group-hover:translate-x-1 transition">&rarr;</span>
                         </Link>
@@ -140,7 +151,7 @@ export default function Dashboard({ stats = {}, recentStudents = [] }) {
                         >
                             <div>
                                 <h3 className="font-bold text-lg">Pending Fees</h3>
-                                <p className="text-amber-100 text-sm">Track & update unpaid student dues</p>
+                                <p className="text-amber-100 text-xs">Track unpaid dues</p>
                             </div>
                             <span className="text-2xl transform group-hover:translate-x-1 transition">&rarr;</span>
                         </Link>

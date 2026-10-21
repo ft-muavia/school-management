@@ -6,11 +6,16 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    $classes = \App\Models\SchoolClass::orderBy('name')->get();
+    $totalTeachers = \App\Models\Teacher::count();
+    $totalStudents = \App\Models\Student::count();
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+        'classes' => $classes,
+        'totalTeachers' => $totalTeachers,
+        'totalStudents' => $totalStudents,
     ]);
 });
 
@@ -22,6 +27,7 @@ Route::get('/dashboard', function () {
         'total_pending_fee' => \App\Models\Student::where('fee_status', 'pending')->sum('monthly_fee'),
         'total_classes' => \App\Models\SchoolClass::count(),
         'total_subjects' => \App\Models\Subject::count(),
+        'total_teachers' => \App\Models\Teacher::count(),
     ];
 
     $recentStudents = \App\Models\Student::with(['schoolClass', 'subjects'])
@@ -43,6 +49,9 @@ Route::middleware('auth')->group(function () {
     // School Management: Student Routes
     Route::resource('students', \App\Http\Controllers\StudentController::class);
     Route::patch('students/{student}/toggle-fee', [\App\Http\Controllers\StudentController::class, 'toggleFeeStatus'])->name('students.toggleFee');
+
+    // School Management: Teacher Routes
+    Route::resource('teachers', \App\Http\Controllers\TeacherController::class);
 });
 
 require __DIR__.'/auth.php';
