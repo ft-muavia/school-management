@@ -28,8 +28,22 @@ export default function StudentsIndex({ students, classes = [], subjects = [], f
         router.get(route('students.index'));
     };
 
-    const toggleFee = (id) => {
-        router.patch(route('students.toggleFee', id), {}, { preserveScroll: true });
+    const toggleFee = (id, newStatus = null) => {
+        router.patch(
+            route('students.toggleFee', id),
+            newStatus ? { fee_status: newStatus } : {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    if (selectedStudent && selectedStudent.id === id) {
+                        setSelectedStudent((prev) => ({
+                            ...prev,
+                            fee_status: newStatus || (prev.fee_status === 'paid' ? 'pending' : 'paid'),
+                        }));
+                    }
+                },
+            }
+        );
     };
 
     const deleteStudent = (id, name) => {
@@ -162,7 +176,7 @@ export default function StudentsIndex({ students, classes = [], subjects = [], f
                                         <th className="px-6 py-3.5 text-left">Student Info</th>
                                         <th className="px-6 py-3.5 text-left">Father's Name</th>
                                         <th className="px-6 py-3.5 text-left">Class</th>
-                                        <th className="px-6 py-3.5 text-left">Subjects Enrolled</th>
+                                        <th className="px-6 py-3.5 text-left">Subject Stream</th>
                                         <th className="px-6 py-3.5 text-left">Fee Status</th>
                                         <th className="px-6 py-3.5 text-left">Address</th>
                                         <th className="px-6 py-3.5 text-right">Actions</th>
@@ -196,36 +210,37 @@ export default function StudentsIndex({ students, classes = [], subjects = [], f
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <div className="flex flex-wrap gap-1 max-w-xs">
-                                                        {student.subjects?.map((sub) => (
-                                                            <span
-                                                                key={sub.id}
-                                                                className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md font-medium"
-                                                            >
-                                                                {sub.name}
-                                                            </span>
-                                                        ))}
-                                                        {(!student.subjects || student.subjects.length === 0) && (
-                                                            <span className="text-xs text-gray-400 italic">No subjects assigned</span>
-                                                        )}
-                                                    </div>
+                                                    {student.group_stream === 'CS' || student.subjects?.some(s => s.name.toLowerCase().includes('computer')) ? (
+                                                        <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-indigo-100 text-indigo-800 border border-indigo-200">
+                                                            💻 CS
+                                                        </span>
+                                                    ) : student.group_stream === 'BIO' || student.subjects?.some(s => s.name.toLowerCase().includes('bio')) ? (
+                                                        <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                            🔬 BIO
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-purple-100 text-purple-800 border border-purple-200">
+                                                            🎨 ARTS
+                                                        </span>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="space-y-1">
                                                         <div className="font-semibold text-gray-800 text-xs">
                                                             PKR {Number(student.monthly_fee).toLocaleString()}
                                                         </div>
-                                                        <button
-                                                            onClick={() => toggleFee(student.id)}
-                                                            title="Click to toggle fee status"
-                                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold cursor-pointer transition ${
+                                                        <select
+                                                            value={student.fee_status}
+                                                            onChange={(e) => toggleFee(student.id, e.target.value)}
+                                                            className={`text-[11px] font-bold rounded-lg px-2 py-1 border cursor-pointer focus:ring-1 focus:ring-offset-1 transition ${
                                                                 student.fee_status === 'paid'
-                                                                    ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                                                                    : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+                                                                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300 focus:ring-emerald-500'
+                                                                    : 'bg-amber-50 text-amber-800 border-amber-300 focus:ring-amber-500'
                                                             }`}
                                                         >
-                                                            {student.fee_status === 'paid' ? '✓ Paid' : '⏳ Pending'}
-                                                        </button>
+                                                            <option value="paid">✓ Paid</option>
+                                                            <option value="pending">⏳ Pending</option>
+                                                        </select>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 text-xs text-gray-600 max-w-xs truncate" title={student.address}>
@@ -296,14 +311,36 @@ export default function StudentsIndex({ students, classes = [], subjects = [], f
                         >
                             &times;
                         </button>
-                        <div className="border-b pb-4 mb-4">
-                            <span className="text-xs font-mono font-semibold text-indigo-600 uppercase">
-                                {selectedStudent.admission_number}
-                            </span>
-                            <h3 className="text-xl font-bold text-gray-800">{selectedStudent.name}</h3>
-                            <p className="text-xs text-gray-500">
-                                Enrolled in: {selectedStudent.school_class?.name} ({selectedStudent.school_class?.section})
-                            </p>
+                        <div className="border-b pb-4 mb-4 flex items-start justify-between pr-8">
+                            <div>
+                                <span className="text-xs font-mono font-semibold text-indigo-600 uppercase">
+                                    {selectedStudent.admission_number}
+                                </span>
+                                <h3 className="text-xl font-bold text-gray-800">{selectedStudent.name}</h3>
+                                <p className="text-xs text-gray-500">
+                                    Enrolled in: {selectedStudent.school_class?.name} ({selectedStudent.school_class?.section})
+                                </p>
+                            </div>
+
+                            {/* Top Card Fee Dropdown */}
+                            <div className="flex flex-col items-end">
+                                <label className="text-[10px] font-bold uppercase text-gray-400 mb-1">
+                                    Fee Status:
+                                </label>
+                                <select
+                                    value={selectedStudent.fee_status}
+                                    onChange={(e) => toggleFee(selectedStudent.id, e.target.value)}
+                                    className={`text-xs font-bold rounded-lg px-2.5 py-1.5 border shadow-xs cursor-pointer focus:ring-2 focus:ring-offset-1 transition ${
+                                        selectedStudent.fee_status === 'paid'
+                                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300 focus:ring-emerald-500'
+                                            : 'bg-amber-50 text-amber-800 border-amber-300 focus:ring-amber-500'
+                                    }`}
+                                >
+                                    <option value="paid">✓ Paid (Cleared)</option>
+                                    <option value="pending">⏳ Pending (Unpaid)</option>
+                                </select>
+                                <span className="text-[10px] text-gray-400 mt-1">PKR {Number(selectedStudent.monthly_fee).toLocaleString()}</span>
+                            </div>
                         </div>
 
                         <div className="space-y-3 text-sm">
@@ -336,15 +373,20 @@ export default function StudentsIndex({ students, classes = [], subjects = [], f
                             </div>
 
                             <div className="pt-2">
-                                <span className="text-xs text-gray-400 block mb-1">Subjects (Konsy hain)</span>
-                                <div className="flex flex-wrap gap-1.5">
-                                    {selectedStudent.subjects?.map((sub) => (
-                                        <span key={sub.id} className="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded font-medium">
-                                            {sub.name} {sub.code ? `(${sub.code})` : ''}
+                                <span className="text-xs text-gray-400 block mb-1">Subject Stream:</span>
+                                <div>
+                                    {selectedStudent.group_stream === 'CS' || selectedStudent.subjects?.some(s => s.name.toLowerCase().includes('computer')) ? (
+                                        <span className="inline-flex items-center px-3.5 py-1 rounded-lg text-sm font-black bg-indigo-100 text-indigo-900 border border-indigo-300">
+                                            💻 Computer Science (CS Stream)
                                         </span>
-                                    ))}
-                                    {(!selectedStudent.subjects || selectedStudent.subjects.length === 0) && (
-                                        <span className="text-xs text-gray-400">None assigned</span>
+                                    ) : selectedStudent.group_stream === 'BIO' || selectedStudent.subjects?.some(s => s.name.toLowerCase().includes('bio')) ? (
+                                        <span className="inline-flex items-center px-3.5 py-1 rounded-lg text-sm font-black bg-emerald-100 text-emerald-900 border border-emerald-300">
+                                            🔬 Biology / Pre-Medical (BIO Stream)
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center px-3.5 py-1 rounded-lg text-sm font-black bg-purple-100 text-purple-900 border border-purple-300">
+                                            🎨 General Arts (ARTS Stream)
+                                        </span>
                                     )}
                                 </div>
                             </div>

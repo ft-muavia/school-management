@@ -19,6 +19,7 @@ class Student extends Model
         'address',
         'phone',
         'school_class_id',
+        'group_stream',
         'monthly_fee',
         'fee_status',
         'admission_date',

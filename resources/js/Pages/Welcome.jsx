@@ -107,8 +107,8 @@ export default function Welcome({ auth, canLogin, classes = [], totalTeachers = 
             <Head title="Welcome - School Admission & Campus Facilities" />
 
             {/* Top Navigation Bar */}
-            <header className="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b border-gray-100 shadow-xs">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+            <header className="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-gray-100 shadow-xs py-4 sm:py-5">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-md">
                             S
@@ -123,14 +123,14 @@ export default function Welcome({ auth, canLogin, classes = [], totalTeachers = 
                         </div>
                     </div>
 
-                    <nav className="flex items-center space-x-3">
-                        <a href="#criteria" className="hidden md:inline-block text-sm font-semibold text-gray-600 hover:text-indigo-600 px-3 py-2">
+                    <nav className="flex items-center space-x-6">
+                        <a href="#criteria" className="hidden md:inline-block text-base font-semibold text-gray-400 hover:text-black transition px-2 py-1">
                             Admission Criteria
                         </a>
-                        <a href="#facilities" className="hidden md:inline-block text-sm font-semibold text-gray-600 hover:text-indigo-600 px-3 py-2">
+                        <a href="#facilities" className="hidden md:inline-block text-base font-semibold text-gray-400 hover:text-black transition px-2 py-1">
                             Campus Facilities
                         </a>
-                        <a href="#sports" className="hidden md:inline-block text-sm font-semibold text-gray-600 hover:text-indigo-600 px-3 py-2">
+                        <a href="#sports" className="hidden md:inline-block text-base font-semibold text-gray-400 hover:text-black transition px-2 py-1">
                             Sports by Class
                         </a>
 

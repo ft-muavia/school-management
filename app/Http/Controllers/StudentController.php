@@ -85,6 +85,7 @@ class StudentController extends Controller
             'address' => 'required|string|max:500',
             'phone' => 'nullable|string|max:20',
             'school_class_id' => 'required|exists:school_classes,id',
+            'group_stream' => 'required|in:CS,BIO,ARTS',
             'monthly_fee' => 'required|numeric|min:0',
             'fee_status' => 'required|in:paid,pending',
             'admission_date' => 'nullable|date',
@@ -134,6 +135,7 @@ class StudentController extends Controller
             'address' => 'required|string|max:500',
             'phone' => 'nullable|string|max:20',
             'school_class_id' => 'required|exists:school_classes,id',
+            'group_stream' => 'required|in:CS,BIO,ARTS',
             'monthly_fee' => 'required|numeric|min:0',
             'fee_status' => 'required|in:paid,pending',
             'admission_date' => 'nullable|date',
@@ -152,11 +154,16 @@ class StudentController extends Controller
     }
 
     /**
-     * Quick toggle for fee status.
+     * Quick update or toggle for fee status.
      */
-    public function toggleFeeStatus(Student $student)
+    public function toggleFeeStatus(Request $request, Student $student)
     {
-        $newStatus = $student->fee_status === 'paid' ? 'pending' : 'paid';
+        if ($request->has('fee_status') && in_array($request->fee_status, ['paid', 'pending'])) {
+            $newStatus = $request->fee_status;
+        } else {
+            $newStatus = $student->fee_status === 'paid' ? 'pending' : 'paid';
+        }
+
         $student->update(['fee_status' => $newStatus]);
 
         return redirect()->back()->with('success', "Fee status updated to {$newStatus}!");

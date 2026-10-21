@@ -14,6 +14,7 @@ export default function StudentEdit({ student, classes = [], subjects = [] }) {
         address: student.address || '',
         phone: student.phone || '',
         school_class_id: student.school_class_id || '',
+        group_stream: student.group_stream || (student.subjects?.some(s => s.name.toLowerCase().includes('bio')) ? 'BIO' : student.subjects?.some(s => s.name.toLowerCase().includes('computer')) ? 'CS' : 'ARTS'),
         monthly_fee: student.monthly_fee || 0,
         fee_status: student.fee_status || 'pending',
         admission_date: student.admission_date || '',
@@ -254,6 +255,44 @@ export default function StudentEdit({ student, classes = [], subjects = [] }) {
                                     </select>
                                     {errors.school_class_id && (
                                         <p className="text-red-500 text-xs mt-1">{errors.school_class_id}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">
+                                        Subject Stream (CS / BIO / ARTS) *
+                                    </label>
+                                    <select
+                                        value={data.group_stream}
+                                        onChange={(e) => {
+                                            const stream = e.target.value;
+                                            setData('group_stream', stream);
+                                            if (stream === 'CS') {
+                                                const csSubjs = subjects.filter(s => 
+                                                    !s.name.toLowerCase().includes('bio') && !s.name.toLowerCase().includes('art')
+                                                ).map(s => s.id);
+                                                setData(prev => ({ ...prev, group_stream: stream, subject_ids: csSubjs }));
+                                            } else if (stream === 'BIO') {
+                                                const bioSubjs = subjects.filter(s => 
+                                                    !s.name.toLowerCase().includes('computer') && !s.name.toLowerCase().includes('art')
+                                                ).map(s => s.id);
+                                                setData(prev => ({ ...prev, group_stream: stream, subject_ids: bioSubjs }));
+                                            } else if (stream === 'ARTS') {
+                                                const artSubjs = subjects.filter(s => 
+                                                    !s.name.toLowerCase().includes('computer') && !s.name.toLowerCase().includes('bio') && !s.name.toLowerCase().includes('chem') && !s.name.toLowerCase().includes('phys')
+                                                ).map(s => s.id);
+                                                setData(prev => ({ ...prev, group_stream: stream, subject_ids: artSubjs }));
+                                            }
+                                        }}
+                                        className="w-full text-sm font-bold rounded-lg border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                                        required
+                                    >
+                                        <option value="CS">💻 Computer Science (CS)</option>
+                                        <option value="BIO">🔬 Biology / Pre-Medical (BIO)</option>
+                                        <option value="ARTS">🎨 General Arts (ARTS)</option>
+                                    </select>
+                                    {errors.group_stream && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.group_stream}</p>
                                     )}
                                 </div>
 

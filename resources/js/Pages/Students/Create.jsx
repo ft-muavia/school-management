@@ -12,6 +12,7 @@ export default function StudentCreate({ classes = [], subjects = [], suggestedAd
         address: '',
         phone: '',
         school_class_id: classes[0]?.id || '',
+        group_stream: 'CS',
         monthly_fee: 3500,
         fee_status: 'pending',
         admission_date: new Date().toISOString().split('T')[0],
@@ -257,6 +258,45 @@ export default function StudentCreate({ classes = [], subjects = [], suggestedAd
                                     </select>
                                     {errors.school_class_id && (
                                         <p className="text-red-500 text-xs mt-1">{errors.school_class_id}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">
+                                        Subject Stream (CS / BIO / ARTS) *
+                                    </label>
+                                    <select
+                                        value={data.group_stream}
+                                        onChange={(e) => {
+                                            const stream = e.target.value;
+                                            setData('group_stream', stream);
+                                            // Auto-select relevant subjects for this stream
+                                            if (stream === 'CS') {
+                                                const csSubjs = subjects.filter(s => 
+                                                    !s.name.toLowerCase().includes('bio') && !s.name.toLowerCase().includes('art')
+                                                ).map(s => s.id);
+                                                setData(prev => ({ ...prev, group_stream: stream, subject_ids: csSubjs }));
+                                            } else if (stream === 'BIO') {
+                                                const bioSubjs = subjects.filter(s => 
+                                                    !s.name.toLowerCase().includes('computer') && !s.name.toLowerCase().includes('art')
+                                                ).map(s => s.id);
+                                                setData(prev => ({ ...prev, group_stream: stream, subject_ids: bioSubjs }));
+                                            } else if (stream === 'ARTS') {
+                                                const artSubjs = subjects.filter(s => 
+                                                    !s.name.toLowerCase().includes('computer') && !s.name.toLowerCase().includes('bio') && !s.name.toLowerCase().includes('chem') && !s.name.toLowerCase().includes('phys')
+                                                ).map(s => s.id);
+                                                setData(prev => ({ ...prev, group_stream: stream, subject_ids: artSubjs }));
+                                            }
+                                        }}
+                                        className="w-full text-sm font-bold rounded-lg border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                                        required
+                                    >
+                                        <option value="CS">💻 Computer Science (CS)</option>
+                                        <option value="BIO">🔬 Biology / Pre-Medical (BIO)</option>
+                                        <option value="ARTS">🎨 General Arts (ARTS)</option>
+                                    </select>
+                                    {errors.group_stream && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.group_stream}</p>
                                     )}
                                 </div>
 
